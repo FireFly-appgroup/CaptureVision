@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
-using System.Text;
 using Capture = CaptureVision.DAL.Models.Capture;
 
 namespace CaptureVision.BLL.Services
