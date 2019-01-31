@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using Tesseract;
 
 namespace CaptureVision.Vision
 {
@@ -127,6 +128,21 @@ namespace CaptureVision.Vision
 
             return bmPhoto;
         }
+
+        //public static string OCR(Bitmap bitmap)
+        //{
+        //    string res = "";
+        //    using (var engine = new TesseractEngine(@"D:\Capture\CaptureVision\CaptureVision.Vision\tessdata", "eng", EngineMode.Default))
+        //    {
+        //        engine.SetVariable("tessedit_char_whitelist", "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        //        engine.SetVariable("tessedit_unrej_any_wd", true);
+
+        //        using (var page = engine.Process(bitmap, PageSegMode.SingleLine))
+        //                res = page.GetText();
+
+        //    }
+        //    return res;
+        //}
 
 
         //public async void GetFormat()

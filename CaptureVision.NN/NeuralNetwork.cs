@@ -20,7 +20,10 @@ namespace CaptureVision.NN
             var ListOfCapture = _query.GetPicturesFromDB();
 
             foreach (var item in ListOfCapture)
+            {
                 _processedImage = DataProcessing.GetMask(item.CaptureImage);
+                string Text = DataProcessing.OCR(_processedImage);
+            }
         }
     }
 }
