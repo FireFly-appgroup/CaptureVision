@@ -10,7 +10,8 @@ namespace CaptureVision.NN
 {
     public class NeuralNetwork
     {
-        private Bitmap _processedImage;
+        private List<Bitmap> _processedImage = new List<Bitmap>();
+        //private object _lockObject = new object();
 
         public static void RunProcessing()
         {
@@ -25,11 +26,25 @@ namespace CaptureVision.NN
                 return new Queries().GetPicturesFromDB();
             }).Result;
 
-            foreach (var item in CaptchasFromDB)
+            //lock (_lockObject)
+            //{
+            //        Parallel.ForEach(CaptchasFromDB, element =>
+            //        {
+            //        _processedImage.Add(DataProcessing.GetMask(element.CaptureImage));
+            //        });
+            //}
+
+            CaptchasFromDB.ForEach(t =>
             {
-                _processedImage = DataProcessing.GetMask(item.CaptureImage);
-                //   string Text = DataProcessing.OCR(_processedImage).ToString();
-            } 
+                _processedImage.Add(DataProcessing.GetMask(t.CaptureImage));
+            });
+
+
+            //foreach (var item in CaptchasFromDB)
+            //{
+            //    _processedImage = DataProcessing.GetMask(item.CaptureImage);
+            //    //   string Text = DataProcessing.OCR(_processedImage).ToString();
+            //} 
         }
     }
 }

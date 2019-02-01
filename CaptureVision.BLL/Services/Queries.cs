@@ -13,6 +13,8 @@ namespace CaptureVision.BLL.Services
         private MySqlConnection _conn;
         private MySqlCommand _cmd;
         private List<Capture> _captures = new List<Capture>();
+        private int _limit = 10;
+        private string query = String.Empty;
 
         public Queries()
         {
@@ -45,7 +47,12 @@ namespace CaptureVision.BLL.Services
             try
             {
                 _conn.Open();
-                string query = $"SELECT * FROM `Capture` WHERE ID != 1;";
+
+                if (_limit > 0)
+                     query = $"SELECT * FROM `Capture` WHERE ID != 1 LIMIT '{_limit}';";
+                else
+                     query = $"SELECT * FROM `Capture` WHERE ID != 1;";
+
                 _cmd = new MySqlCommand();
                 _cmd.Connection = _conn;
                 _cmd.CommandText = query;
