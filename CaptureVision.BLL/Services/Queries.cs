@@ -49,7 +49,7 @@ namespace CaptureVision.BLL.Services
                 _conn.Open();
 
                 if (_limit > 0)
-                     query = $"SELECT * FROM `Capture` WHERE ID != 1 LIMIT '{_limit}';";
+                     query = $"SELECT * FROM `Capture` WHERE ID != 1 LIMIT {_limit};";
                 else
                      query = $"SELECT * FROM `Capture` WHERE ID != 1;";
 
