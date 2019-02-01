@@ -48,8 +48,10 @@ namespace CaptureVision.Vision
                 {
                     var temp = ClearBitmap(_bitmap, c.Key);
                     if (i == 0)
+                    {
                         _bitmap = new Bitmap(temp);
-                //    temp.Save(String.Format("D:\\mask-{0}.bmp", i));
+                        temp.Save(String.Format("D:\\mask-{0}.bmp", i));
+                    }
                     i++;
                 }
             }

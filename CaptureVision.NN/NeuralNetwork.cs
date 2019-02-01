@@ -1,13 +1,17 @@
 ﻿using CaptureVision.BLL.Services;
+using CaptureVision.DAL.Models;
 using CaptureVision.Vision;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace CaptureVision.NN
 {
     public class NeuralNetwork
     {
-        private Queries _query;
         private Bitmap _processedImage;
+
         public static void RunProcessing()
         {
             var neuralNetwork = new NeuralNetwork();
@@ -16,14 +20,16 @@ namespace CaptureVision.NN
 
         private void RunAsync()
         {
-            _query = new Queries();
-            var ListOfCapture = _query.GetPicturesFromDB();
+            List<Capture> CaptchasFromDB = Task.Factory.StartNew(() => 
+            {
+                return new Queries().GetPicturesFromDB();
+            }).Result;
 
-            foreach (var item in ListOfCapture)
+            foreach (var item in CaptchasFromDB)
             {
                 _processedImage = DataProcessing.GetMask(item.CaptureImage);
-               // string Text = DataProcessing.OCR(_processedImage);
-            }
+                //   string Text = DataProcessing.OCR(_processedImage).ToString();
+            } 
         }
     }
 }
