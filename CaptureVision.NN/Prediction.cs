@@ -5,6 +5,6 @@ namespace CaptureVision.NN
     public class Prediction
     {
         [ColumnName("Score")]
-        public float Output { get; set; }
+        public string Output { get; set; } //or bool
     }
 }
