@@ -70,31 +70,27 @@ namespace CaptureVision.Vision
             //filter.ApplyInPlace(_bitmap);
 
 
-
-            //var temp2 = GetSymbolsArray(_bitmap);
-            var binary = imageToBinary(_bitmap);
-
             return _bitmap;
         }
 
-        private static string imageToBinary(Bitmap img)
+        public static string ImageToBinary(Bitmap img)
         {
             string texto = "";
             try
             {
-                for (int i = 0; i < img.Width; i++)
+                for (int i = 0; i < img.Height; i++)
                 {
-                    for (int j = 0; j < img.Height; j++)
+                    for (int j = 0; j < img.Width; j++)
                     {
-                            if (img.GetPixel(i, j).A.ToString() == "255" &&//j,i
-                                img.GetPixel(i, j).B.ToString() == "255" &&//j,i
-                                img.GetPixel(i, j).G.ToString() == "255" &&//j,i
-                                img.GetPixel(i, j).R.ToString() == "255")//j,i
-                            {
-                                texto = texto + "0";
-                            }
-                            else
-                                texto = texto + "1";
+                        if (img.GetPixel(j, i).A.ToString() == "255" &&
+                            img.GetPixel(j, i).B.ToString() == "255" &&
+                            img.GetPixel(j, i).G.ToString() == "255" &&
+                            img.GetPixel(j, i).R.ToString() == "255")
+                        {
+                            texto = texto + "0";
+                        }
+                        else
+                            texto = texto + "1";
                     }
                     texto = texto + "\r\n"; // this is to make the enter between lines  
                 }

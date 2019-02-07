@@ -17,6 +17,7 @@ namespace CaptureVision.NN
     public class NeuralNetwork
     {
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
+        private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
         private List<Tuple<string, Bitmap>> _predictData = new List<Tuple<string, Bitmap>>();
         //private List<TrainingData> _listOfData = new List<TrainingData>();
         //private TrainingData _data;
@@ -30,7 +31,7 @@ namespace CaptureVision.NN
 
         private void RunAsync()
         {
-            List<Capture> CaptchasFromDB = Task.Factory.StartNew(() => 
+            List<Capture> CaptchasFromDB = Task.Factory.StartNew(() =>
             {
                 return new Queries().GetPicturesFromDB();
             }).Result;
@@ -38,6 +39,11 @@ namespace CaptureVision.NN
             CaptchasFromDB.ForEach(t =>
             {
                 _processedImage.Add(new Tuple<string, Bitmap>(t.Result, DataProcessing.GetMask(t.CaptureImage)));
+            });
+
+            _processedImage.ForEach(t =>
+            {
+                _processedBinaryImage.Add(new Tuple<string, string>(t.Item1, DataProcessing.ImageToBinary(t.Item2)));
             });
 
             MLContext mlContext = new MLContext(seed: 0);
