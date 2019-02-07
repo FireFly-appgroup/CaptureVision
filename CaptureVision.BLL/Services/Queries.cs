@@ -14,7 +14,8 @@ namespace CaptureVision.BLL.Services
         private MySqlCommand _cmd;
         private List<Capture> _captures = new List<Capture>();
         private int _limit = 10;
-        private string query = String.Empty;
+        private string _query = String.Empty;
+        private Capture _predictCapture;
 
         public Queries()
         {
@@ -49,13 +50,13 @@ namespace CaptureVision.BLL.Services
                 _conn.Open();
 
                 if (_limit > 0)
-                     query = $"SELECT * FROM `Capture` WHERE ID != 1 LIMIT {_limit};";
+                    _query = $"SELECT * FROM `Capture` WHERE ID != 1 LIMIT {_limit};";
                 else
-                     query = $"SELECT * FROM `Capture` WHERE ID != 1;";
+                    _query = $"SELECT * FROM `Capture` WHERE ID != 1;";
 
                 _cmd = new MySqlCommand();
                 _cmd.Connection = _conn;
-                _cmd.CommandText = query;
+                _cmd.CommandText = _query;
                 _cmd.ExecuteNonQuery();
         
                 Capture capture;
@@ -82,6 +83,43 @@ namespace CaptureVision.BLL.Services
             }
 
             return _captures;
+        }
+
+        public Capture GetPictureForPredict()
+        {
+            try
+            {
+                _conn.Open();
+
+                _query = $"SELECT * FROM `Capture` WHERE ID == 1;";
+
+                _cmd = new MySqlCommand();
+                _cmd.Connection = _conn;
+                _cmd.CommandText = _query;
+                _cmd.ExecuteNonQuery();
+
+                
+                using (DbDataReader reader = _cmd.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            _predictCapture = new Capture();
+                            _predictCapture.CaptureImage = reader.GetString(reader.GetOrdinal("CaptureImage"));
+                            _predictCapture.Result = reader.GetString(reader.GetOrdinal("Result"));
+                        }
+                    }
+                }
+
+                _conn.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            return _predictCapture;
         }
     }
 }

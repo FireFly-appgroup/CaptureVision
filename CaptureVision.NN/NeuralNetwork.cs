@@ -1,16 +1,25 @@
 ﻿using CaptureVision.BLL.Services;
 using CaptureVision.DAL.Models;
 using CaptureVision.Vision;
+using Microsoft.ML;
+using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CaptureVision.NN
 {
     public class NeuralNetwork
     {
-        private List<Bitmap> _processedImage = new List<Bitmap>();
+        private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
+        private List<Tuple<string, Bitmap>> _predictData = new List<Tuple<string, Bitmap>>();
+        //private List<TrainingData> _listOfData = new List<TrainingData>();
+        //private TrainingData _data;
         //private object _lockObject = new object();
 
         public static void RunProcessing()
@@ -26,25 +35,36 @@ namespace CaptureVision.NN
                 return new Queries().GetPicturesFromDB();
             }).Result;
 
-            //lock (_lockObject)
-            //{
-            //        Parallel.ForEach(CaptchasFromDB, element =>
-            //        {
-            //        _processedImage.Add(DataProcessing.GetMask(element.CaptureImage));
-            //        });
-            //}
-
             CaptchasFromDB.ForEach(t =>
             {
-                _processedImage.Add(DataProcessing.GetMask(t.CaptureImage));
+                _processedImage.Add(new Tuple<string, Bitmap>(t.Result, DataProcessing.GetMask(t.CaptureImage)));
             });
 
+            MLContext mlContext = new MLContext(seed: 0);
 
-            //foreach (var item in CaptchasFromDB)
-            //{
-            //    _processedImage = DataProcessing.GetMask(item.CaptureImage);
-            //    //   string Text = DataProcessing.OCR(_processedImage).ToString();
-            //} 
+            //IDataView trainingDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, Bitmap>>>());
+            //IDataView testDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, Bitmap>>>());
+
+            //var dataProcessPipeline = mlContext.Transforms.Text.FeaturizeText("Input", "Output");
+
+            //var trainer = mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Output", featureColumn: "Input");
+            //var trainingPipeline = dataProcessPipeline.Append(trainer);
+
+            //ITransformer trainedModel = trainingPipeline.Fit(trainingDataView);
+
+            //var predictions = trainedModel.Transform(testDataView);
+            //var metrics = mlContext.BinaryClassification.Evaluate(predictions, "Output", "Score");
+
+            //var predEngine = trainedModel.CreatePredictionEngine<TrainingData, Prediction>(mlContext);
+
+            //var predictData = new Queries().GetPictureForPredict();
+
+            //TrainingData data = new TrainingData();
+            //data.Input = DataProcessing.GetMask(predictData.CaptureImage);
+            //data.Output = predictData.Result;
+
+            //var resultprediction = predEngine.Predict(data);
+
         }
     }
 }

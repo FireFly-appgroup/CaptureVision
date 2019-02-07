@@ -1,6 +1,10 @@
-﻿using AForge.Imaging.Filters;
+﻿using AForge;
+using AForge.Imaging;
+using AForge.Imaging.Filters;
+using AForge.Math.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -12,17 +16,20 @@ namespace CaptureVision.Vision
     public class DataProcessing
     {
         private static Bitmap _bitmap;
-        private static Image _image;
+        private static System.Drawing.Image _image;
 
         public static Bitmap GetMask(string input)
         {
             var bytes = Convert.FromBase64String(input);
             using (MemoryStream ms = new MemoryStream(bytes))
             {
-                _image = Image.FromStream(ms);
+                _image = System.Drawing.Image.FromStream(ms);
             }
 
             _bitmap = AddingFilters(_image);
+
+            //_bitmap.Save(String.Format("D:\\mask1.bmp"));
+            //var binary2 = imageToBinary(_bitmap);
 
             var palette = new Dictionary<Color, int>();
             for (var x = 0; x < _bitmap.Width; x++)
@@ -50,15 +57,97 @@ namespace CaptureVision.Vision
                     if (i == 0)
                     {
                         _bitmap = new Bitmap(temp);
-                        //temp.Save(String.Format("D:\\mask-{0}.bmp", i));
+                        temp.Save(String.Format("D:\\mask-{0}.bmp", i));
                     }
                     i++;
                 }
             }
 
+            //ContrastStretch filter = new ContrastStretch();
+            //filter.ApplyInPlace(_bitmap);
+            //_bitmap.Save(String.Format("D:\\mask.bmp"));
+            //ContrastCorrection filter = new ContrastCorrection(255);
+            //filter.ApplyInPlace(_bitmap);
+
+
+
+            //var temp2 = GetSymbolsArray(_bitmap);
+            var binary = imageToBinary(_bitmap);
+
             return _bitmap;
         }
 
+        private static string imageToBinary(Bitmap img)
+        {
+            string texto = "";
+            try
+            {
+                for (int i = 0; i < img.Width; i++)
+                {
+                    for (int j = 0; j < img.Height; j++)
+                    {
+                            if (img.GetPixel(i, j).A.ToString() == "255" &&//j,i
+                                img.GetPixel(i, j).B.ToString() == "255" &&//j,i
+                                img.GetPixel(i, j).G.ToString() == "255" &&//j,i
+                                img.GetPixel(i, j).R.ToString() == "255")//j,i
+                            {
+                                texto = texto + "0";
+                            }
+                            else
+                                texto = texto + "1";
+                    }
+                    texto = texto + "\r\n"; // this is to make the enter between lines  
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            return texto;
+        }
+
+        public static BlobCounterBase GetSymbolsArray(Bitmap bitmap)
+        {
+            BlobCounterBase bc = new BlobCounter();
+            // set filtering options
+            bc.FilterBlobs = true;
+            bc.MinWidth = 5;
+            bc.MinHeight = 5;
+            // set ordering options
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            // process binary image
+            bc.ProcessImage(bitmap);
+            Blob[] blobs = bc.GetObjectsInformation();
+            // extract the biggest blob
+            if (blobs.Length > 0)
+            {
+                bc.ExtractBlobsImage(bitmap, blobs[0], true);
+            }
+
+            foreach (var item in blobs)
+            {
+                if (item.Image != null)
+                {
+                    _bitmap = new Bitmap(item.Image.ToManagedImage());
+                    _bitmap.Save(String.Format("D:\\mask.bmp"));
+                }
+            }
+
+            return bc;
+        }
+        //public Bitmap CropImage(Bitmap source, Rectangle section)
+        //{
+        //    // An empty bitmap which will hold the cropped image
+        //    Bitmap bmp = new Bitmap(section.Width, section.Height);
+
+        //    Graphics g = Graphics.FromImage(bmp);
+
+        //    // Draw the given area (section) of the source image
+        //    // at location 0,0 on the empty bitmap (bmp)
+        //    g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
+
+        //    return bmp;
+        //}
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
             var result = new Bitmap(input.Width, input.Height);
@@ -75,7 +164,7 @@ namespace CaptureVision.Vision
         }
 
 
-        public static Bitmap AddingFilters(Image image)
+        public static Bitmap AddingFilters(System.Drawing.Image image)
         {
             Bitmap bitmap = new Bitmap(image);
 
