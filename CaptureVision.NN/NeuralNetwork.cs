@@ -18,11 +18,6 @@ namespace CaptureVision.NN
     {
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
         private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
-        private List<Tuple<string, Bitmap>> _predictData = new List<Tuple<string, Bitmap>>();
-        //private List<TrainingData> _listOfData = new List<TrainingData>();
-        //private TrainingData _data;
-        //private object _lockObject = new object();
-        private TrainingData _data;
         private List<TrainingData> _trainingdata = new List<TrainingData>();
 
         public static void RunProcessing()
@@ -45,11 +40,7 @@ namespace CaptureVision.NN
 
             _processedImage.ForEach(t =>
             {
-                _data = new TrainingData();
-                _data.InputVector = DataProcessing.ImageToBinary(t.Item2);
-                _data.OutputVector = t.Item1;
-                _trainingdata.Add(_data);
-                //_processedBinaryImage.Add(new Tuple<string, string>(t.Item1, DataProcessing.ImageToBinary(t.Item2)));
+                _trainingdata.Add(new TrainingData() { InputVector = DataProcessing.ImageToBinary(t.Item2), OutputVector = t.Item1 });
             });
 
             MLContext mlContext = new MLContext(seed: 0);
@@ -76,7 +67,6 @@ namespace CaptureVision.NN
             //data.Output = predictData.Result;
 
             //var resultprediction = predEngine.Predict(data);
-
         }
     }
 }
