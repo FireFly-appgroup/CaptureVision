@@ -30,9 +30,7 @@ namespace CaptureVision.BLL.Services
                 _conn.Open();
                 string query =
                     $"INSERT INTO `Capture` (`CaptureImage`, `FileName`, `Result`) VALUES ('{Picture}', '{FileName}', '{Result}');";
-                _cmd = new MySqlCommand();
-                _cmd.Connection = _conn;
-                _cmd.CommandText = query;
+                _cmd = new MySqlCommand() { Connection = _conn, CommandText = query };
                 _cmd.ExecuteNonQuery();
                 _conn.Close();
 
@@ -54,9 +52,7 @@ namespace CaptureVision.BLL.Services
                 else
                     _query = $"SELECT * FROM `Capture` WHERE ID != 1;";
 
-                _cmd = new MySqlCommand();
-                _cmd.Connection = _conn;
-                _cmd.CommandText = _query;
+                _cmd = new MySqlCommand() { Connection = _conn, CommandText = _query };
                 _cmd.ExecuteNonQuery();
         
                 Capture capture;
@@ -93,9 +89,7 @@ namespace CaptureVision.BLL.Services
 
                 _query = $"SELECT * FROM `Capture` WHERE ID == 1;";
 
-                _cmd = new MySqlCommand();
-                _cmd.Connection = _conn;
-                _cmd.CommandText = _query;
+                _cmd = new MySqlCommand() { Connection = _conn, CommandText = _query };
                 _cmd.ExecuteNonQuery();
 
                 
