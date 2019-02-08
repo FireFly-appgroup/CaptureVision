@@ -22,6 +22,8 @@ namespace CaptureVision.NN
         //private List<TrainingData> _listOfData = new List<TrainingData>();
         //private TrainingData _data;
         //private object _lockObject = new object();
+        private TrainingData _data;
+        private List<TrainingData> _trainingdata = new List<TrainingData>();
 
         public static void RunProcessing()
         {
@@ -43,19 +45,23 @@ namespace CaptureVision.NN
 
             _processedImage.ForEach(t =>
             {
-                _processedBinaryImage.Add(new Tuple<string, string>(t.Item1, DataProcessing.ImageToBinary(t.Item2)));
+                _data = new TrainingData();
+                _data.InputVector = DataProcessing.ImageToBinary(t.Item2);
+                _data.OutputVector = t.Item1;
+                _trainingdata.Add(_data);
+                //_processedBinaryImage.Add(new Tuple<string, string>(t.Item1, DataProcessing.ImageToBinary(t.Item2)));
             });
 
             MLContext mlContext = new MLContext(seed: 0);
 
-            //IDataView trainingDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, Bitmap>>>());
-            //IDataView testDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, Bitmap>>>());
+            IDataView trainingDataView = mlContext.CreateStreamingDataView<TrainingData>(_trainingdata);
 
-            //var dataProcessPipeline = mlContext.Transforms.Text.FeaturizeText("Input", "Output");
+            //IDataView trainingDataView = mlContext.CreateStreamingDataView(_processedBinaryImage.Cast<List<Tuple<string, string>>>());
+            //IDataView testDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, string>>>());
 
-            //var trainer = mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Output", featureColumn: "Input");
+            //var dataProcessPipeline = mlContext.Transforms.Text.FeaturizeText("Input", "Label");
+            //var trainer = mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Features", featureColumn: "Input");
             //var trainingPipeline = dataProcessPipeline.Append(trainer);
-
             //ITransformer trainedModel = trainingPipeline.Fit(trainingDataView);
 
             //var predictions = trainedModel.Transform(testDataView);

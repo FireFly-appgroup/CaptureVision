@@ -4,7 +4,7 @@ namespace CaptureVision.NN
 {
     public class Prediction
     {
-        [ColumnName("Score")]
+        [ColumnName("PredictedLabel")]
         public string Output { get; set; } //or bool
     }
 }
