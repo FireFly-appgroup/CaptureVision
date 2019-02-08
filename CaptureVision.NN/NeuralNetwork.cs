@@ -17,7 +17,7 @@ namespace CaptureVision.NN
     public class NeuralNetwork
     {
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
-        private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
+        //private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
         private List<TrainingData> _trainingdata = new List<TrainingData>();
 
         public static void RunProcessing()
