@@ -23,40 +23,39 @@ namespace CaptureVision.Vision
                 _image = System.Drawing.Image.FromStream(ms);
             }
 
-            Bitmap bitmap = new Bitmap(_image);
-            _bitmap = AddingFilters(bitmap);
+            _bitmap = AddingFilters(new Bitmap(_image));
+            _bitmap.Save(String.Format("D:\\test.bmp"));
+            //var palette = new Dictionary<Color, int>();
+            //for (var x = 0; x < _bitmap.Width; x++)
+            //{
+            //    for (var y = 0; y < _bitmap.Height; y++)
+            //    {
+            //        var clr = _bitmap.GetPixel(x, y);
+            //        if (!palette.ContainsKey(clr))
+            //        {
+            //            palette.Add(clr, 1);
+            //        }
+            //        else
+            //        {
+            //            palette[clr] = palette[clr] + 1;
+            //        }
+            //    }
+            //}
+            //var i = 0;
 
-            var palette = new Dictionary<Color, int>();
-            for (var x = 0; x < _bitmap.Width; x++)
-            {
-                for (var y = 0; y < _bitmap.Height; y++)
-                {
-                    var clr = _bitmap.GetPixel(x, y);
-                    if (!palette.ContainsKey(clr))
-                    {
-                        palette.Add(clr, 1);
-                    }
-                    else
-                    {
-                        palette[clr] = palette[clr] + 1;
-                    }
-                }
-            }
-            var i = 0;
-
-            foreach (var c in palette)
-            {
-                if (c.Value > 30)
-                {
-                    var temp = ClearBitmap(_bitmap, c.Key);
-                    if (i == 0)
-                    {
-                        _bitmap = new Bitmap(temp);
-                        temp.Save(String.Format("D:\\mask-{0}.bmp", i));
-                    }
-                    i++;
-                }
-            }
+            //foreach (var c in palette)
+            //{
+            //    if (c.Value > 30)
+            //    {
+            //        var temp = ClearBitmap(_bitmap, c.Key);
+            //        if (i == 0)
+            //        {
+            //            _bitmap = new Bitmap(temp);
+            //            temp.Save(String.Format("D:\\mask-{0}.bmp", i));
+            //        }
+            //        i++;
+            //    }
+            //}
 
             return _bitmap;
         }
@@ -164,14 +163,17 @@ namespace CaptureVision.Vision
             cor.Blue = new IntRange(200, 255);
             cor.Red = new IntRange(200, 255);
             cor.Green = new IntRange(200, 255);
+            Opening open = new Opening();
             BlobsFiltering bc = new BlobsFiltering();
-            Closing close = new Closing();
+            Closing close = new Closing(); //?
+            GaussianSharpen gs = new GaussianSharpen(); //?
             ContrastCorrection cc = new ContrastCorrection();
-            bc.MinHeight = 10;
-            FiltersSequence seq = new FiltersSequence(inverter, inverter, bc, inverter, cc, cor, bc, inverter);
-
+            bc.MinHeight = 15; //10 
+            bc.MinWidth = 15; // ?
+            //FiltersSequence seq = new FiltersSequence(inverter, inverter, bc, inverter, cc, cor, bc, inverter);
+            FiltersSequence seq = new FiltersSequence(open, gs, inverter, inverter, bc, inverter, cc, cor, bc, inverter);
             var result = ScaleByPercent(grayImage, 200);
-
+            
             return seq.Apply(result);
         }
 
