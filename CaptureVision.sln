@@ -11,11 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptureVision.BLL", "Captur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureVisionTestForm", "CaptureVisionTestForm\CaptureVisionTestForm.csproj", "{CD154B45-6711-465C-B164-FA03CB3DD028}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureVision.Vision", "CaptureVision.Vision\CaptureVision.Vision.csproj", "{0F60B4E9-05FF-43ED-B3F7-E73801A619DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptureVision.Vision", "CaptureVision.Vision\CaptureVision.Vision.csproj", "{0F60B4E9-05FF-43ED-B3F7-E73801A619DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureVision.API", "CaptureVision.API\CaptureVision.API.csproj", "{3A2D0615-4632-4D9B-BEDF-6C334487128F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptureVision.API", "CaptureVision.API\CaptureVision.API.csproj", "{3A2D0615-4632-4D9B-BEDF-6C334487128F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureVision.NN", "CaptureVision.NN\CaptureVision.NN.csproj", "{FDF25104-F358-46A5-982E-994877AD07E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptureVision.NN", "CaptureVision.NN\CaptureVision.NN.csproj", "{FDF25104-F358-46A5-982E-994877AD07E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

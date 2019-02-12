@@ -19,6 +19,7 @@ namespace CaptureVision.NN
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
         //private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
         private List<TrainingData> _trainingdata = new List<TrainingData>();
+        private static object syncRoot = new Object();
 
         public static void RunProcessing()
         {
@@ -28,20 +29,23 @@ namespace CaptureVision.NN
 
         private void RunAsync()
         {
-            List<Capture> CaptchasFromDB = Task.Factory.StartNew(() =>
+            lock (syncRoot)
             {
-                return new Queries().GetPicturesFromDB();
-            }).Result;
+                List<Capture> CaptchasFromDB = Task.Factory.StartNew(() =>
+                {
+                    return new Queries().GetPicturesFromDB();
+                }).Result;
 
-            CaptchasFromDB.ForEach(t =>
-            {
-                _processedImage.Add(new Tuple<string, Bitmap>(t.Result, DataProcessing.GetMask(t.CaptureImage)));
-            });
+                CaptchasFromDB.ForEach(t =>
+                {
+                    _processedImage.Add(new Tuple<string, Bitmap>(t.Result, DataProcessing.GetMask(t.CaptureImage)));
+                });
 
-            _processedImage.ForEach(t =>
-            {
-                _trainingdata.Add(new TrainingData() { InputVector = DataProcessing.ImageToBinary(t.Item2), OutputVector = t.Item1 });
-            });
+                _processedImage.ForEach(t =>
+                {
+                    _trainingdata.Add(new TrainingData() { InputVector = DataProcessing.ImageToBinary(t.Item2), OutputVector = t.Item1 });
+                });
+            }
 
             MLContext mlContext = new MLContext(seed: 0);
 

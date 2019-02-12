@@ -1,7 +1,5 @@
 ﻿using AForge;
-using AForge.Imaging;
 using AForge.Imaging.Filters;
-using AForge.Math.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +7,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using Tesseract;
 
 namespace CaptureVision.Vision
 {
@@ -27,9 +24,6 @@ namespace CaptureVision.Vision
             }
 
             _bitmap = AddingFilters(_image);
-
-            //_bitmap.Save(String.Format("D:\\mask1.bmp"));
-            //var binary2 = imageToBinary(_bitmap);
 
             var palette = new Dictionary<Color, int>();
             for (var x = 0; x < _bitmap.Width; x++)
@@ -53,22 +47,15 @@ namespace CaptureVision.Vision
             {
                 if (c.Value > 30)
                 {
-                    var temp = ClearBitmap(_bitmap, c.Key);
+                    ClearBitmap(ref _bitmap, c.Key);
                     if (i == 0)
                     {
-                        _bitmap = new Bitmap(temp);
-                        temp.Save(String.Format("D:\\mask-{0}.bmp", i));
+                        _bitmap = new Bitmap(_bitmap);
+                        _bitmap.Save(String.Format("D:\\mask-{0}.bmp", i));
                     }
                     i++;
                 }
             }
-
-            //ContrastStretch filter = new ContrastStretch();
-            //filter.ApplyInPlace(_bitmap);
-            //_bitmap.Save(String.Format("D:\\mask.bmp"));
-            //ContrastCorrection filter = new ContrastCorrection(255);
-            //filter.ApplyInPlace(_bitmap);
-
 
             return _bitmap;
         }
@@ -102,35 +89,35 @@ namespace CaptureVision.Vision
             return texto;
         }
 
-        public static BlobCounterBase GetSymbolsArray(Bitmap bitmap)
-        {
-            BlobCounterBase bc = new BlobCounter();
-            // set filtering options
-            bc.FilterBlobs = true;
-            bc.MinWidth = 5;
-            bc.MinHeight = 5;
-            // set ordering options
-            bc.ObjectsOrder = ObjectsOrder.Size;
-            // process binary image
-            bc.ProcessImage(bitmap);
-            Blob[] blobs = bc.GetObjectsInformation();
-            // extract the biggest blob
-            if (blobs.Length > 0)
-            {
-                bc.ExtractBlobsImage(bitmap, blobs[0], true);
-            }
+        //public static BlobCounterBase GetSymbolsArray(Bitmap bitmap)
+        //{
+        //    BlobCounterBase bc = new BlobCounter();
+        //    set filtering options
+        //    bc.FilterBlobs = true;
+        //    bc.MinWidth = 5;
+        //    bc.MinHeight = 5;
+        //    set ordering options
+        //    bc.ObjectsOrder = ObjectsOrder.Size;
+        //    process binary image
+        //    bc.ProcessImage(bitmap);
+        //    Blob[] blobs = bc.GetObjectsInformation();
+        //    extract the biggest blob
+        //    if (blobs.Length > 0)
+        //    {
+        //        bc.ExtractBlobsImage(bitmap, blobs[0], true);
+        //    }
 
-            foreach (var item in blobs)
-            {
-                if (item.Image != null)
-                {
-                    _bitmap = new Bitmap(item.Image.ToManagedImage());
-                    _bitmap.Save(String.Format("D:\\mask.bmp"));
-                }
-            }
+        //    foreach (var item in blobs)
+        //    {
+        //        if (item.Image != null)
+        //        {
+        //            _bitmap = new Bitmap(item.Image.ToManagedImage());
+        //            _bitmap.Save(String.Format("D:\\mask.bmp"));
+        //        }
+        //    }
 
-            return bc;
-        }
+        //    return bc;
+        //}
         //public Bitmap CropImage(Bitmap source, Rectangle section)
         //{
         //    // An empty bitmap which will hold the cropped image
@@ -144,19 +131,17 @@ namespace CaptureVision.Vision
 
         //    return bmp;
         //}
-        public static Bitmap ClearBitmap(Bitmap input, Color clr)
+
+        public static void ClearBitmap(ref Bitmap input, Color clr)
         {
-            var result = new Bitmap(input.Width, input.Height);
             for (var x = 0; x < input.Width; x++)
             {
                 for (var y = 0; y < input.Height; y++)
                 {
                     var color = input.GetPixel(x, y);
-                    result.SetPixel(x, y, clr == color ? Color.Black : Color.White);
+                    input.SetPixel(x, y, clr == color ? Color.Black : Color.White);
                 }
             }
-
-            return result;
         }
 
 
@@ -175,9 +160,9 @@ namespace CaptureVision.Vision
             Dilatation dilatation = new Dilatation();
             Invert inverter = new Invert();
             ColorFiltering cor = new ColorFiltering();
-            cor.Blue = new AForge.IntRange(200, 255);
-            cor.Red = new AForge.IntRange(200, 255);
-            cor.Green = new AForge.IntRange(200, 255);
+            cor.Blue = new IntRange(200, 255);
+            cor.Red = new IntRange(200, 255);
+            cor.Green = new IntRange(200, 255);
             BlobsFiltering bc = new BlobsFiltering();
             Closing close = new Closing();
             ContrastCorrection cc = new ContrastCorrection();
@@ -210,49 +195,9 @@ namespace CaptureVision.Vision
                               new Rectangle(0, 0, destWidth, destHeight),
                               new Rectangle(0, 0, sourceWidth, sourceHeight),
                               GraphicsUnit.Pixel);
-            // bmPhoto.Save(@"D:\Scale.png", System.Drawing.Imaging.ImageFormat.Png);
             grPhoto.Dispose();
 
             return bmPhoto;
         }
-
-        //public static string OCR(Bitmap bitmap)
-        //{
-        //    string res = "";
-        //    using (var engine = new TesseractEngine(@"D:\Capture\CaptureVision\CaptureVision.Vision\tessdata", "eng", EngineMode.Default))
-        //    {
-        //        engine.SetVariable("tessedit_char_whitelist", "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        //        engine.SetVariable("tessedit_unrej_any_wd", true);
-
-        //        using (var page = engine.Process(bitmap, PageSegMode.SingleLine))
-        //                res = page.GetText();
-
-        //    }
-        //    return res;
-        //}
-
-
-        //public async void GetFormat()
-        //{
-        //    using (var sourceStream = await sourceFile.OpenAsync(FileAccessMode.Read))
-        //    {
-        //        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(sourceStream);
-        //        BitmapTransform transform = new BitmapTransform() { ScaledHeight = 80, ScaledWidth = 80 };
-        //        PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
-        //            BitmapPixelFormat.Rgba8,
-        //            BitmapAlphaMode.Straight,
-        //            transform,
-        //            ExifOrientationMode.RespectExifOrientation,
-        //            ColorManagementMode.DoNotColorManage);
-
-        //        using (var destinationStream = await destinationFile.OpenAsync(FileAccessMode.ReadWrite))
-        //        {
-        //            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, destinationStream);
-        //            encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Premultiplied, 80, 80, 96, 96, pixelData.DetachPixelData());
-        //            await encoder.FlushAsync();
-        //        }
-        //    }
-        //}
-
     }
 }
