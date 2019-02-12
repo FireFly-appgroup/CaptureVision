@@ -23,7 +23,8 @@ namespace CaptureVision.Vision
                 _image = System.Drawing.Image.FromStream(ms);
             }
 
-            _bitmap = AddingFilters(_image);
+            Bitmap bitmap = new Bitmap(_image);
+            _bitmap = AddingFilters(bitmap);
 
             var palette = new Dictionary<Color, int>();
             for (var x = 0; x < _bitmap.Width; x++)
@@ -47,11 +48,11 @@ namespace CaptureVision.Vision
             {
                 if (c.Value > 30)
                 {
-                    ClearBitmap(ref _bitmap, c.Key);
+                    var temp = ClearBitmap(_bitmap, c.Key);
                     if (i == 0)
                     {
-                        _bitmap = new Bitmap(_bitmap);
-                        _bitmap.Save(String.Format("D:\\mask-{0}.bmp", i));
+                        _bitmap = new Bitmap(temp);
+                        temp.Save(String.Format("D:\\mask-{0}.bmp", i));
                     }
                     i++;
                 }
@@ -92,16 +93,16 @@ namespace CaptureVision.Vision
         //public static BlobCounterBase GetSymbolsArray(Bitmap bitmap)
         //{
         //    BlobCounterBase bc = new BlobCounter();
-        //    set filtering options
+        //    // set filtering options
         //    bc.FilterBlobs = true;
         //    bc.MinWidth = 5;
         //    bc.MinHeight = 5;
-        //    set ordering options
+        //    // set ordering options
         //    bc.ObjectsOrder = ObjectsOrder.Size;
-        //    process binary image
+        //    // process binary image
         //    bc.ProcessImage(bitmap);
         //    Blob[] blobs = bc.GetObjectsInformation();
-        //    extract the biggest blob
+        //    // extract the biggest blob
         //    if (blobs.Length > 0)
         //    {
         //        bc.ExtractBlobsImage(bitmap, blobs[0], true);
@@ -131,24 +132,24 @@ namespace CaptureVision.Vision
 
         //    return bmp;
         //}
-
-        public static void ClearBitmap(ref Bitmap input, Color clr)
+        public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
+            var result = new Bitmap(input.Width, input.Height);
             for (var x = 0; x < input.Width; x++)
             {
                 for (var y = 0; y < input.Height; y++)
                 {
                     var color = input.GetPixel(x, y);
-                    input.SetPixel(x, y, clr == color ? Color.Black : Color.White);
+                    result.SetPixel(x, y, clr == color ? Color.Black : Color.White);
                 }
             }
+
+            return result;
         }
 
 
-        public static Bitmap AddingFilters(System.Drawing.Image image)
+        public static Bitmap AddingFilters(Bitmap bitmap)
         {
-            Bitmap bitmap = new Bitmap(image);
-
             Grayscale grayscale_filter = new Grayscale(0.2125, 0.7154, 0.0721);
             Bitmap grayImage = grayscale_filter.Apply(bitmap);
 
