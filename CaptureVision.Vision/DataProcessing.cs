@@ -24,7 +24,8 @@ namespace CaptureVision.Vision
             }
 
             _bitmap = AddingFilters(new Bitmap(_image));
-            _bitmap.Save(String.Format("D:\\test.bmp"));
+            var CuttingBitmap = CutSection(_bitmap, new Rectangle(5, 5, _bitmap.Width - 10, _bitmap.Height-10));
+            CuttingBitmap.Save(String.Format("D:\\test.bmp"));
             //var palette = new Dictionary<Color, int>();
             //for (var x = 0; x < _bitmap.Width; x++)
             //{
@@ -57,7 +58,24 @@ namespace CaptureVision.Vision
             //    }
             //}
 
-            return _bitmap;
+            return CuttingBitmap;
+        }
+
+        public static Bitmap CutSection(Bitmap image, Rectangle selection)
+        {
+            Bitmap bmp = image as Bitmap;
+
+            // Check if it is a bitmap:
+            if (bmp == null)
+                throw new ArgumentException("No valid bitmap");
+
+            // Crop the image:
+            Bitmap cropBmp = bmp.Clone(selection, bmp.PixelFormat);
+
+            // Release the resources:
+            image.Dispose();
+
+            return cropBmp;
         }
 
         public static string ImageToBinary(Bitmap img)
