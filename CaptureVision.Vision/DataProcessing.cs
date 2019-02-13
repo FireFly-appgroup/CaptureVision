@@ -87,15 +87,9 @@ namespace CaptureVision.Vision
                 {
                     for (int j = 0; j < img.Width; j++)
                     {
-                        if (img.GetPixel(j, i).A.ToString() == "255" &&
-                            img.GetPixel(j, i).B.ToString() == "255" &&
-                            img.GetPixel(j, i).G.ToString() == "255" &&
-                            img.GetPixel(j, i).R.ToString() == "255")
-                        {
-                            texto = texto + "0";
-                        }
-                        else
-                            texto = texto + "1";
+                        texto = (img.GetPixel(j, i).A.ToString() == "255" && img.GetPixel(j, i).B.ToString() == "255" &&
+                                 img.GetPixel(j, i).G.ToString() == "255" && img.GetPixel(j, i).R.ToString() == "255") 
+                                 ? texto + "0" : texto + "1";
                     }
                     texto = texto + "\r\n"; // this is to make the enter between lines  
                 }
