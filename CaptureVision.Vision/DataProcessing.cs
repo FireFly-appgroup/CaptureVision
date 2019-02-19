@@ -101,7 +101,7 @@ namespace CaptureVision.Vision
             return texto;
         }
 
-        public static Tuple<string, string> BinaryToSymbol(string vector, string symbols)
+        public static IEnumerable<Tuple<string, string>> BinaryToSymbol(string vector, string symbols)
         {
             string inputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
@@ -114,13 +114,12 @@ namespace CaptureVision.Vision
                     for (int j = 0; j < vectorArray[0].Length; j++)
                     {
                         multidimensionalArray[i, j] = vector[j].ToString();
+                        inputSymbol = "test"; //TODO: input Symbols Vector
                     }
                 }
 
-                _result = new Tuple<string, string>(inputSymbol, item.ToString()); //TODO: inputSymbols
+                yield return new Tuple<string, string>(inputSymbol, item.ToString()); 
             }
-
-            return _result;
         }
   
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
