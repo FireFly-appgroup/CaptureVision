@@ -19,8 +19,7 @@ namespace CaptureVision.NN
 
         public static void RunProcessing()
         {
-            var neuralNetwork = new NeuralNetwork();
-            neuralNetwork.RunAsync();
+            new NeuralNetwork().RunAsync();
         }
 
         private void RunAsync()
