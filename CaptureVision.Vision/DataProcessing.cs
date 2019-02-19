@@ -80,7 +80,7 @@ namespace CaptureVision.Vision
 
         public static string ImageToBinary(Bitmap img)
         {
-            string texto = "";
+            string texto = String.Empty;
             try
             {
                 for (int i = 0; i < img.Height; i++)
@@ -101,48 +101,23 @@ namespace CaptureVision.Vision
             return texto;
         }
 
-        //public static BlobCounterBase GetSymbolsArray(Bitmap bitmap)
-        //{
-        //    BlobCounterBase bc = new BlobCounter();
-        //    // set filtering options
-        //    bc.FilterBlobs = true;
-        //    bc.MinWidth = 5;
-        //    bc.MinHeight = 5;
-        //    // set ordering options
-        //    bc.ObjectsOrder = ObjectsOrder.Size;
-        //    // process binary image
-        //    bc.ProcessImage(bitmap);
-        //    Blob[] blobs = bc.GetObjectsInformation();
-        //    // extract the biggest blob
-        //    if (blobs.Length > 0)
-        //    {
-        //        bc.ExtractBlobsImage(bitmap, blobs[0], true);
-        //    }
+        public static string BinaryToSymbol(string vector)
+        {
+            string symbol = String.Empty;
+            string[] vectorArray = vector.Split('\n');
+            string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
+         
+            for (int i = 0; i < vectorArray.Length; i++)
+            {
+                for (int j = 0; j < vectorArray[0].Length; j++)
+                {
+                    multidimensionalArray[i,j] = vector[j].ToString();
+                }
+            }
 
-        //    foreach (var item in blobs)
-        //    {
-        //        if (item.Image != null)
-        //        {
-        //            _bitmap = new Bitmap(item.Image.ToManagedImage());
-        //            _bitmap.Save(String.Format("D:\\mask.bmp"));
-        //        }
-        //    }
-
-        //    return bc;
-        //}
-        //public Bitmap CropImage(Bitmap source, Rectangle section)
-        //{
-        //    // An empty bitmap which will hold the cropped image
-        //    Bitmap bmp = new Bitmap(section.Width, section.Height);
-
-        //    Graphics g = Graphics.FromImage(bmp);
-
-        //    // Draw the given area (section) of the source image
-        //    // at location 0,0 on the empty bitmap (bmp)
-        //    g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
-
-        //    return bmp;
-        //}
+            return symbol;
+        }
+  
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
             var result = new Bitmap(input.Width, input.Height);

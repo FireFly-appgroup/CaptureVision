@@ -11,4 +11,13 @@ namespace CaptureVision.NN
         [Column("1")]
         public string OutputVector { get; set; }//output (Labels)
     }
+
+    public class TrainingDataForSymbol
+    {
+        [Column("0")]
+        public string InputVector { get; set; }
+
+        [Column("1")]
+        public string OutputVector { get; set; }//output (Labels)
+    }
 }

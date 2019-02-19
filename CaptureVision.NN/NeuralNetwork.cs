@@ -14,8 +14,9 @@ namespace CaptureVision.NN
     {
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
         //private List<Tuple<string, string>> _processedBinaryImage = new List<Tuple<string, string>>();
-        private List<TrainingData> _trainingdata = new List<TrainingData>();
-        private static object syncRoot = new Object();
+        private List<TrainingData> _trainingData = new List<TrainingData>();
+        private List<TrainingDataForSymbol> _trainingDataForSymbol = new List<TrainingDataForSymbol>();
+        private static object _syncRoot = new Object();
 
         public static void RunProcessing()
         {
@@ -25,7 +26,7 @@ namespace CaptureVision.NN
 
         private void RunAsync()
         {
-            lock (syncRoot)
+            lock (_syncRoot)
             {
                 List<Capture> CaptchasFromDB = Task.Factory.StartNew(() =>
                 {
@@ -39,13 +40,19 @@ namespace CaptureVision.NN
 
                 _processedImage.ForEach(t =>
                 {
-                    _trainingdata.Add(new TrainingData() { InputVector = DataProcessing.ImageToBinary(t.Item2), OutputVector = t.Item1 });
+                    _trainingData.Add(new TrainingData() { InputVector = DataProcessing.ImageToBinary(t.Item2), OutputVector = t.Item1 });
+                });
+
+                _trainingData.ForEach(t =>
+                {
+                    foreach (var item in t.OutputVector)
+                    _trainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = DataProcessing.BinaryToSymbol(t.InputVector), OutputVector = item.ToString() });
                 });
             }
 
             MLContext mlContext = new MLContext(seed: 0);
 
-            IDataView trainingDataView = mlContext.CreateStreamingDataView<TrainingData>(_trainingdata);
+            IDataView trainingDataView = mlContext.CreateStreamingDataView<TrainingData>(_trainingData);
 
             //IDataView trainingDataView = mlContext.CreateStreamingDataView(_processedBinaryImage.Cast<List<Tuple<string, string>>>());
             //IDataView testDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, string>>>());
