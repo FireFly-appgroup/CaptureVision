@@ -14,7 +14,7 @@ namespace CaptureVision.Vision
     {
         private static Bitmap _bitmap;
         private static System.Drawing.Image _image;
-
+        private static Tuple<string, string> _result;
         public static Bitmap GetMask(string input)
         {
             var bytes = Convert.FromBase64String(input);
@@ -101,21 +101,26 @@ namespace CaptureVision.Vision
             return texto;
         }
 
-        public static string BinaryToSymbol(string vector)
+        public static Tuple<string, string> BinaryToSymbol(string vector, string symbols)
         {
-            string symbol = String.Empty;
+            string inputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
             string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
-         
-            for (int i = 0; i < vectorArray.Length; i++)
+            
+            foreach (var item in symbols)
             {
-                for (int j = 0; j < vectorArray[0].Length; j++)
+                for (int i = 0; i < vectorArray.Length; i++)
                 {
-                    multidimensionalArray[i,j] = vector[j].ToString();
+                    for (int j = 0; j < vectorArray[0].Length; j++)
+                    {
+                        multidimensionalArray[i, j] = vector[j].ToString();
+                    }
                 }
+
+                _result = new Tuple<string, string>(inputSymbol, item.ToString()); //TODO: inputSymbols
             }
 
-            return symbol;
+            return _result;
         }
   
         public static Bitmap ClearBitmap(Bitmap input, Color clr)

@@ -45,8 +45,8 @@ namespace CaptureVision.NN
 
                 _trainingData.ForEach(t =>
                 {
-                    foreach (var item in t.OutputVector)
-                    _trainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = DataProcessing.BinaryToSymbol(t.InputVector), OutputVector = item.ToString() });
+                    var result = DataProcessing.BinaryToSymbol(t.InputVector, t.OutputVector);
+                    _trainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = result.Item1, OutputVector = result.Item2 });
                 });
             }
 
