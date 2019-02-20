@@ -14,7 +14,7 @@ namespace CaptureVision.Vision
     {
         private static Bitmap _bitmap;
         private static System.Drawing.Image _image;
-        private static Tuple<string, string> _result;
+        //private static Tuple<string, string> _result;
         public static Bitmap GetMask(string input)
         {
             var bytes = Convert.FromBase64String(input);
