@@ -106,7 +106,7 @@ namespace CaptureVision.Vision
             string inputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
             string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
-            
+            //multidimensionalArray = RemovingNoises(vectorArray, vector);
             foreach (var item in symbols)
             {
                 for (int i = 0; i < vectorArray.Length; i++)
@@ -122,6 +122,39 @@ namespace CaptureVision.Vision
             }
         }
   
+        //public static string[,] RemovingNoises(string[] input, string vector)
+        //{
+        //    string[,] ProcessedArray = new string[input.Length, input[0].Length];
+        //    for (int i = 0; i < input.Length; i++)
+        //    {
+        //        for (int j = 0; j < input[0].Length; j++)
+        //        {
+        //            ProcessedArray[i, j] = vector[j].ToString();
+        //        }
+        //    }
+
+        //    for (int i = 0; i < input.Length; i++)
+        //    {
+        //        for (int j = 0; j < input[0].Length; j++)
+        //        {
+        //            if (ProcessedArray[i, j] == "1" && ProcessedArray[i, j + 1] != "1" && ProcessedArray[i, j - 1] != "1")
+        //                ProcessedArray[i, j] = "0";
+        //        }
+        //    }
+
+        //    string test = String.Empty;
+        //    for (int i = 0; i < ProcessedArray.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < ProcessedArray.GetLength(1); j++)
+        //        {
+        //            test += ProcessedArray[i, j];
+        //        }
+        //    }
+
+
+        //    return ProcessedArray;
+        //}
+
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
             var result = new Bitmap(input.Width, input.Height);
