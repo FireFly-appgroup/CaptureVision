@@ -173,6 +173,8 @@ namespace CaptureVision.Vision
 
         public static Bitmap AddingFilters(Bitmap bitmap)
         {
+            //ContrastCorrection contrastfilter = new ContrastCorrection(15);
+            //contrastfilter.ApplyInPlace(bitmap);
             Grayscale grayscale_filter = new Grayscale(0.2125, 0.7154, 0.0721);
             Bitmap grayImage = grayscale_filter.Apply(bitmap);
 
