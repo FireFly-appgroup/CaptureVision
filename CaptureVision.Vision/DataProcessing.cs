@@ -173,8 +173,6 @@ namespace CaptureVision.Vision
 
         public static Bitmap AddingFilters(Bitmap bitmap)
         {
-            //ContrastCorrection contrastfilter = new ContrastCorrection(15);
-            //contrastfilter.ApplyInPlace(bitmap);
             Grayscale grayscale_filter = new Grayscale(0.2125, 0.7154, 0.0721);
             Bitmap grayImage = grayscale_filter.Apply(bitmap);
 
@@ -182,22 +180,19 @@ namespace CaptureVision.Vision
             threshold_filter.ApplyInPlace(grayImage);
 
             grayImage = grayImage.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format24bppRgb);
-            Erosion erosion = new Erosion();
-            Dilatation dilatation = new Dilatation();
-            Invert inverter = new Invert();
-            ColorFiltering cor = new ColorFiltering();
-            cor.Blue = new IntRange(200, 255);
-            cor.Red = new IntRange(200, 255);
-            cor.Green = new IntRange(200, 255);
-            Opening open = new Opening();
-            BlobsFiltering bc = new BlobsFiltering();
-            Closing close = new Closing(); //?
-            GaussianSharpen gs = new GaussianSharpen(); //?
-            ContrastCorrection cc = new ContrastCorrection();
-            bc.MinHeight = 15; //10 
-            bc.MinWidth = 15; // ?
+            //Erosion erosion = new Erosion();
+            //Dilatation dilatation = new Dilatation();
             //FiltersSequence seq = new FiltersSequence(inverter, inverter, bc, inverter, cc, cor, bc, inverter);
-            FiltersSequence seq = new FiltersSequence(open, gs, inverter, inverter, bc, inverter, cc, cor, bc, inverter);
+            FiltersSequence seq = new FiltersSequence(new Opening(), 
+                                                      new GaussianSharpen(), 
+                                                      new Invert(), 
+                                                      new Invert(), 
+                                                      new BlobsFiltering() { MinHeight = 15, MinWidth = 15 }, 
+                                                      new Invert(), 
+                                                      new ContrastCorrection(), //15
+                                                      new ColorFiltering() { Blue = new IntRange(200, 255), Red = new IntRange(200, 255), Green = new IntRange(200, 255) }, 
+                                                      new BlobsFiltering() { MinHeight = 15, MinWidth = 15 }, 
+                                                      new Invert()); //,new Closing()
             var result = ScaleByPercent(grayImage, 200);
             
             return seq.Apply(result);
