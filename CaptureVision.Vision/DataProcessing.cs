@@ -106,7 +106,7 @@ namespace CaptureVision.Vision
             string inputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
             string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
-          //  multidimensionalArray = RemovingNoises(vectorArray, vector);
+           // multidimensionalArray = RemovingNoises(vectorArray, vector);
             foreach (var item in symbols)
             {
                 for (int i = 0; i < vectorArray.Length; i++)
@@ -136,7 +136,8 @@ namespace CaptureVision.Vision
         //    {
         //        for (int j = 0; j < input[0].Length; j++)
         //        {
-        //            if ((ProcessedArray[i, j] == "0" && ProcessedArray[i, j - 1] == "1" && ProcessedArray[i, j + 1] == "1"))
+        //            if (j >= 1)
+        //            if (ProcessedArray[i, j] == "0" && ProcessedArray[i, j - 1] == "1" && ProcessedArray[i, j + 1] == "1")
         //                ProcessedArray[i, j] = "1";
         //        }
         //    }
@@ -160,7 +161,7 @@ namespace CaptureVision.Vision
             //}
 
 
-            //return ProcessedArray;
+        //    return ProcessedArray;
        // }
 
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
