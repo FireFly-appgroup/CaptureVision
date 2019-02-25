@@ -106,7 +106,7 @@ namespace CaptureVision.Vision
             string inputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
             string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
-            //multidimensionalArray = RemovingNoises(vectorArray, vector);
+          //  multidimensionalArray = RemovingNoises(vectorArray, vector);
             foreach (var item in symbols)
             {
                 for (int i = 0; i < vectorArray.Length; i++)
@@ -121,7 +121,7 @@ namespace CaptureVision.Vision
                 yield return new Tuple<string, string>(inputSymbol, item.ToString()); 
             }
         }
-  
+
         //public static string[,] RemovingNoises(string[] input, string vector)
         //{
         //    string[,] ProcessedArray = new string[input.Length, input[0].Length];
@@ -132,28 +132,36 @@ namespace CaptureVision.Vision
         //            ProcessedArray[i, j] = vector[j].ToString();
         //        }
         //    }
-
         //    for (int i = 0; i < input.Length; i++)
         //    {
         //        for (int j = 0; j < input[0].Length; j++)
         //        {
-        //            if (ProcessedArray[i, j] == "1" && ProcessedArray[i, j + 1] != "1" && ProcessedArray[i, j - 1] != "1")
-        //                ProcessedArray[i, j] = "0";
+        //            if ((ProcessedArray[i, j] == "0" && ProcessedArray[i, j - 1] == "1" && ProcessedArray[i, j + 1] == "1"))
+        //                ProcessedArray[i, j] = "1";
         //        }
         //    }
 
-        //    string test = String.Empty;
-        //    for (int i = 0; i < ProcessedArray.GetLength(0); i++)
-        //    {
-        //        for (int j = 0; j < ProcessedArray.GetLength(1); j++)
-        //        {
-        //            test += ProcessedArray[i, j];
-        //        }
-        //    }
+            //for (int i = 0; i < input.Length; i++)
+            //{
+            //    for (int j = 0; j < input[0].Length; j++)
+            //    {
+            //        if (ProcessedArray[i, j] == "1" && ProcessedArray[i, j + 1] != "1" && ProcessedArray[i, j - 1] != "1")
+            //            ProcessedArray[i, j] = "0";
+            //    }
+            //}
+
+            //string test = String.Empty;
+            //for (int i = 0; i < ProcessedArray.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < ProcessedArray.GetLength(1); j++)
+            //    {
+            //        test += ProcessedArray[i, j];
+            //    }
+            //}
 
 
-        //    return ProcessedArray;
-        //}
+            //return ProcessedArray;
+       // }
 
         public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
@@ -192,7 +200,8 @@ namespace CaptureVision.Vision
                                                       new ContrastCorrection(), //15
                                                       new ColorFiltering() { Blue = new IntRange(200, 255), Red = new IntRange(200, 255), Green = new IntRange(200, 255) }, 
                                                       new BlobsFiltering() { MinHeight = 15, MinWidth = 15 }, 
-                                                      new Invert()); //,new Closing()
+                                                      new Invert(), 
+                                                      new Closing()); //without closing ?
             var result = ScaleByPercent(grayImage, 200);
             
             return seq.Apply(result);
