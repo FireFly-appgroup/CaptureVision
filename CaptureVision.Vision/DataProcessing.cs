@@ -14,7 +14,6 @@ namespace CaptureVision.Vision
     {
         private static Bitmap _bitmap;
         private static System.Drawing.Image _image;
-        //private static Tuple<string, string> _result;
         public static Bitmap GetMask(string input)
         {
             var bytes = Convert.FromBase64String(input);
@@ -64,15 +63,10 @@ namespace CaptureVision.Vision
         public static Bitmap CutSection(Bitmap image, Rectangle selection)
         {
             Bitmap bmp = image as Bitmap;
-
-            // Check if it is a bitmap:
             if (bmp == null)
                 throw new ArgumentException("No valid bitmap");
 
-            // Crop the image:
             Bitmap cropBmp = bmp.Clone(selection, bmp.PixelFormat);
-
-            // Release the resources:
             image.Dispose();
 
             return cropBmp;
@@ -91,7 +85,7 @@ namespace CaptureVision.Vision
                                  img.GetPixel(j, i).G.ToString() == "255" && img.GetPixel(j, i).R.ToString() == "255") 
                                  ? texto + "0" : texto + "1";
                     }
-                    texto = texto + "\r\n"; // this is to make the enter between lines  
+                    texto = texto + "\n"; // this is to make the enter between lines   (\r\n)
                 }
             }
             catch(Exception ex)
@@ -103,68 +97,65 @@ namespace CaptureVision.Vision
 
         public static IEnumerable<Tuple<string, string>> BinaryToSymbol(string vector, string symbols)
         {
-            string inputSymbol = String.Empty;
+            string inputVector = String.Empty;
+            string outputSymbol = String.Empty;
             string[] vectorArray = vector.Split('\n');
-            string[,] multidimensionalArray = new string[vectorArray.Length, vectorArray[0].Length];
-           // multidimensionalArray = RemovingNoises(vectorArray, vector);
+
+            vector = vector.Replace("\n", "");
+            string[][] data = CreateArray<string>(vectorArray.Length, vectorArray[0].Length);
+
             foreach (var item in symbols)
             {
-                for (int i = 0; i < vectorArray.Length; i++)
+                int k = 0;
+    
+
+                for (int i = 0; i < vectorArray.Length-1; i++)
                 {
                     for (int j = 0; j < vectorArray[0].Length; j++)
                     {
-                        multidimensionalArray[i, j] = vector[j].ToString();
-                        inputSymbol = "test"; //TODO: input Symbols Vector
+                            data[i][j] = vector[k++].ToString();
                     }
                 }
+                var newMultidimensionalArray = RemovingNoises(data);
 
-                yield return new Tuple<string, string>(inputSymbol, item.ToString()); 
+                for (int i = 0; i < newMultidimensionalArray.Length-1; i++)
+                {
+                    for (int j = 0; j < newMultidimensionalArray[i].Length; j++)
+                    {
+                        inputVector += data[i][j].ToString();
+                    }
+                    inputVector = inputVector + "\n";
+                }
+                outputSymbol = item.ToString();
+                yield return new Tuple<string, string>(inputVector, outputSymbol); 
             }
         }
 
-        //public static string[,] RemovingNoises(string[] input, string vector)
-        //{
-        //    string[,] ProcessedArray = new string[input.Length, input[0].Length];
-        //    for (int i = 0; i < input.Length; i++)
-        //    {
-        //        for (int j = 0; j < input[0].Length; j++)
-        //        {
-        //            ProcessedArray[i, j] = vector[j].ToString();
-        //        }
-        //    }
-        //    for (int i = 0; i < input.Length; i++)
-        //    {
-        //        for (int j = 0; j < input[0].Length; j++)
-        //        {
-        //            if (j >= 1)
-        //            if (ProcessedArray[i, j] == "0" && ProcessedArray[i, j - 1] == "1" && ProcessedArray[i, j + 1] == "1")
-        //                ProcessedArray[i, j] = "1";
-        //        }
-        //    }
+        static T[][] CreateArray<T>(int rows, int cols)
+        {
+            T[][] array = new T[rows][];
+            for (int i = 0; i < array.GetLength(0); i++)
+                array[i] = new T[cols];
 
-            //for (int i = 0; i < input.Length; i++)
-            //{
-            //    for (int j = 0; j < input[0].Length; j++)
-            //    {
-            //        if (ProcessedArray[i, j] == "1" && ProcessedArray[i, j + 1] != "1" && ProcessedArray[i, j - 1] != "1")
-            //            ProcessedArray[i, j] = "0";
-            //    }
-            //}
+            return array;
+        }
 
-            //string test = String.Empty;
-            //for (int i = 0; i < ProcessedArray.GetLength(0); i++)
-            //{
-            //    for (int j = 0; j < ProcessedArray.GetLength(1); j++)
-            //    {
-            //        test += ProcessedArray[i, j];
-            //    }
-            //}
+        public static string[][] RemovingNoises(string[][] inputMultidimensionalArray)
+        {
+            for (int i = 0; i < inputMultidimensionalArray.Length; i++)
+            {
+                for (int j = 0; j < inputMultidimensionalArray[i].Length; j++)
+                {
+                    if (j >= 1)
+                       if (inputMultidimensionalArray[i][j] == "0" && inputMultidimensionalArray[i][j - 1] == "1" && inputMultidimensionalArray[i][j + 1] == "1")
+                            inputMultidimensionalArray[i][j] = "1";
+                }
+            }
 
+            return inputMultidimensionalArray;
+        }
 
-        //    return ProcessedArray;
-       // }
-
-        public static Bitmap ClearBitmap(Bitmap input, Color clr)
+            public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
             var result = new Bitmap(input.Width, input.Height);
             for (var x = 0; x < input.Width; x++)
