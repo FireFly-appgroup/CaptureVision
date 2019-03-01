@@ -117,7 +117,7 @@ namespace CaptureVision.Vision
                     }
                 }
                 var newMultidimensionalArray = RemovingNoises(data);
-
+              //  var cuttingSymbolsArray = CuttingSymbols(newMultidimensionalArray);
                 for (int i = 0; i < newMultidimensionalArray.Length-1; i++)
                 {
                     for (int j = 0; j < newMultidimensionalArray[i].Length; j++)
@@ -154,6 +154,13 @@ namespace CaptureVision.Vision
 
             return inputMultidimensionalArray;
         }
+
+        //public static List<string[][]> CuttingSymbols(string[][] MultidimensionalStringArray)
+        //{
+        //    List<string[][]> listOfStringArray = new List<string[][]>();
+
+        //    return listOfStringArray;
+        //}
 
             public static Bitmap ClearBitmap(Bitmap input, Color clr)
         {
