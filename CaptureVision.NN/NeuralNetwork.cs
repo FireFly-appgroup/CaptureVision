@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CaptureVision.NN
@@ -17,7 +16,7 @@ namespace CaptureVision.NN
     public class NeuralNetwork
     {
         private List<Tuple<string, Bitmap>> _processedImage = new List<Tuple<string, Bitmap>>();
-        public static List<TrainingDataForSymbol> _trainingDataForSymbol = new List<TrainingDataForSymbol>();
+        public static List<TrainingDataForSymbol> TrainingDataForSymbol = new List<TrainingDataForSymbol>();
         private static readonly object _syncRoot = new Object();
 
         public static void RunProcessing()
@@ -143,7 +142,7 @@ namespace CaptureVision.NN
         private static void ParallelCycleForTrainingSymbol(TrainingData item)
         {
             foreach (Tuple<string, string> tuple in DataProcessing.BinaryToSymbol(item.InputVector, item.OutputVector))
-                     NeuralNetwork._trainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = tuple.Item1,
+                     NeuralNetwork.TrainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = tuple.Item1,
                                                                                             OutputVector = tuple.Item2 });
         }
     }
