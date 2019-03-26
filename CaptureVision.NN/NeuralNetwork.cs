@@ -1,12 +1,13 @@
 ﻿using CaptureVision.BLL.Services;
 using CaptureVision.DAL.Models;
 using CaptureVision.Vision;
+using Microsoft.Data.DataView;
 using Microsoft.ML;
-using Microsoft.ML.Core.Data;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms.Text;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -47,74 +48,37 @@ namespace CaptureVision.NN
             timer.Stop();
             TimeSpan ts = timer.Elapsed;
             Console.WriteLine(ts.ToString());
+
             MLContext mlContext = new MLContext(seed: 0);
+            IDataView data = mlContext.Data.LoadFromEnumerable<TrainingDataForSymbol>(TrainingDataForSymbol);
+            var model = NeuralNetwork.Train(mlContext, data);
 
-            //IDataView trainingDataView = mlContext.CreateStreamingDataView<TrainingData>(_trainingData);
-            //var model = NeuralNetwork.Train(mlContext, trainingDataView);
-            //foreach (var item in _trainingData)
-            //{
-            //    var _predict = EvaluateSinglePrediction(item, mlContext, model).FirstOrDefault();
-            //}
+            foreach (var item in TrainingDataForSymbol)
+            {
+                var _predict = EvaluateSinglePrediction(item, mlContext, model);
+            }
 
-
-
-
+            // var predict = mlContext.Model.CreatePredictionEngine<TrainingDataForSymbol, Prediction>(model);
             //IDataView trainingDataView = mlContext.CreateStreamingDataView(_processedBinaryImage.Cast<List<Tuple<string, string>>>());
             //IDataView testDataView = mlContext.CreateStreamingDataView(_processedImage.Cast<List<Tuple<string, string>>>());
-
-            //var dataProcessPipeline = mlContext.Transforms.Text.FeaturizeText("Input", "Label");
-            //var trainer = mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Features", featureColumn: "Input");
-            //var trainingPipeline = dataProcessPipeline.Append(trainer);
-            //ITransformer trainedModel = trainingPipeline.Fit(trainingDataView);
-
-            //var predictions = trainedModel.Transform(testDataView);
-            //var metrics = mlContext.BinaryClassification.Evaluate(predictions, "Output", "Score");
-
-            //var predEngine = trainedModel.CreatePredictionEngine<TrainingData, Prediction>(mlContext);
-
-            //var predictData = new Queries().GetPictureForPredict();
-
-            //TrainingData data = new TrainingData();
-            //data.Input = DataProcessing.GetMask(predictData.CaptureImage);
-            //data.Output = predictData.Result;
-
-            //var resultprediction = predEngine.Predict(data);
         }
 
-        //public static ITransformer Train(MLContext mlContext, IDataView dataView)
-        //{
-        //    /////////////VERSION 1////////////////
+        public static ITransformer Train(MLContext mlContext, IDataView dataView)
+        {
+            return mlContext.Transforms.CopyColumns("OutputVector", "Label")
+                  .Append(mlContext.Transforms.Concatenate("Features", "InputVector"))
+                  //.Append(mlContext.Transforms.Text.ProduceWordBags("OutputVector", "InputVector")).Fit(dataView);
+                  .Append(mlContext.Transforms.Conversion.MapKeyToValue()).Fit(dataView);
 
-        //    //return mlContext.Transforms.Conversion.MapValueToKey("OutputVector")
-        //    //    .Append(mlContext.Transforms.Categorical.OneHotEncoding("InputVector"))
-        //    //    .Append(mlContext.Transforms.Concatenate("Features", "InputVector"))
-        //    //    .Append(mlContext.MulticlassClassification.Trainers.StochasticDualCoordinateAscent(labelColumn: "OutputVector", featureColumn: "InputVector"))
-        //    //    .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabel")).Fit(dataView);
+        }
 
+        private static IEnumerable<string> EvaluateSinglePrediction(TrainingDataForSymbol currentData, MLContext mlContext, ITransformer model)
+        {
+            var predictionFunction = model.CreatePredictionEngine<TrainingDataForSymbol, Prediction>(mlContext);
+            var prediction = predictionFunction.Predict(currentData);
 
-        //    /////////////VERSION 2////////////////
-        //    //var pipeline =
-        //    //    mlContext.Transforms.Text.FeaturizeText("InputVector", "TextFeatures")
-        //    //    .Append(mlContext.Transforms.Text.NormalizeText("OutputVector", "InputVector"))
-        //    //    .Append(new WordBagEstimator(mlContext, "BagOfWords", "OutputVector"))
-        //    //    .Append(new WordHashBagEstimator(mlContext, "BagOfBigrams", "OutputVector", ngramLength: 2, allLengths: false))
-        //    //    .Append(mlContext.Transforms.Text.TokenizeCharacters("MessageChars", "InputVector"))
-        //    //    .Append(new NgramExtractingEstimator(mlContext, "BagOfTrichar", "MessageChars",
-        //    //                ngramLength: 3, weighting: NgramExtractingEstimator.WeightingCriteria.TfIdf))
-        //    //    .Append(mlContext.Transforms.Text.TokenizeWords("TokenizedMessage", "OutputVector"))
-        //    //    .Append(mlContext.Transforms.Text.ExtractWordEmbeddings("Embeddings", "TokenizedMessage",
-        //    //                WordEmbeddingsExtractingTransformer.PretrainedModelKind.GloVeTwitter25D));
-        //    //return pipeline.Fit(dataView); //pipeline.Fit(data).Transform(data);
-        //}
-
-        //private static IEnumerable<string> EvaluateSinglePrediction(TrainingData currentData, MLContext mlContext, ITransformer model)
-        //{
-        //    var predictionFunction = model.CreatePredictionEngine<TrainingData, Prediction>(mlContext);
-        //    var prediction = predictionFunction.Predict(currentData);
-
-
-        //    yield return prediction.Output;
-        //}
+            yield return prediction.Output;
+        }
     }
 
     public sealed class ParallelClass<T, K, U> where T : List<Tuple<K, U>>
@@ -143,7 +107,7 @@ namespace CaptureVision.NN
         {
             foreach (Tuple<string, string> tuple in DataProcessing.BinaryToSymbol(item.InputVector, item.OutputVector))
                      NeuralNetwork.TrainingDataForSymbol.Add(new TrainingDataForSymbol() { InputVector = tuple.Item1,
-                                                                                            OutputVector = tuple.Item2 });
+                                                                                           OutputVector = tuple.Item2, });
         }
     }
 }

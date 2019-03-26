@@ -5,19 +5,19 @@ namespace CaptureVision.NN
 {
     public class TrainingData
     {
-        [Column("0")] // [ColumnName("InputVector")]]
+        [ColumnName("InputVector")] // [ColumnName("InputVector")]]
         public string InputVector { get; set; }
 
-        [Column("1")] //[ColumnName("OutputVector")]
+        [ColumnName("Label")] //[ColumnName("OutputVector")]
         public string OutputVector { get; set; }//output (Labels)
     }
 
     public class TrainingDataForSymbol
     {
-        [Column("0")]
+        [ColumnName("InputVector")]
         public string InputVector { get; set; }
 
-        [Column("1")]
+        [ColumnName("Label")]
         public string OutputVector { get; set; }//output (Labels)
     }
 }

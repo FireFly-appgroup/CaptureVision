@@ -13,7 +13,7 @@ namespace CaptureVision.BLL.Services
         private MySqlConnection _conn;
         private MySqlCommand _cmd;
         private List<Capture> _captures = new List<Capture>();
-        private int _limit = 10;
+        private readonly int _limit = 10;
         private string _query = String.Empty;
         private Capture _predictCapture;
 
@@ -62,9 +62,11 @@ namespace CaptureVision.BLL.Services
                     {
                         while (reader.Read())
                         {
-                            capture = new Capture();
-                            capture.CaptureImage = reader.GetString(reader.GetOrdinal("CaptureImage"));
-                            capture.Result = reader.GetString(reader.GetOrdinal("Result"));
+                            capture = new Capture
+                            {
+                                CaptureImage = reader.GetString(reader.GetOrdinal("CaptureImage")),
+                                Result = reader.GetString(reader.GetOrdinal("Result"))
+                            };
 
                             _captures.Add(capture);
                         }
@@ -99,9 +101,11 @@ namespace CaptureVision.BLL.Services
                     {
                         while (reader.Read())
                         {
-                            _predictCapture = new Capture();
-                            _predictCapture.CaptureImage = reader.GetString(reader.GetOrdinal("CaptureImage"));
-                            _predictCapture.Result = reader.GetString(reader.GetOrdinal("Result"));
+                            _predictCapture = new Capture
+                            {
+                                CaptureImage = reader.GetString(reader.GetOrdinal("CaptureImage")),
+                                Result = reader.GetString(reader.GetOrdinal("Result"))
+                            };
                         }
                     }
                 }
